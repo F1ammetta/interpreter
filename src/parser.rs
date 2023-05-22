@@ -28,7 +28,6 @@ impl Parser {
     fn parse_statement(&mut self) -> Result<Statement, std::io::Error> {
         match self.current_token {
             Token::Let => self.parse_let_statement(),
-            // Token::Return => self.parse_return_statement(),
             _ => Err(std::io::Error::new(
                 std::io::ErrorKind::InvalidInput,
                 "Invalid token",
@@ -80,8 +79,6 @@ impl Parser {
                 "Invalid input",
             )),
         }
-
-        // Ok(Statement::LetStatement(statement))
     }
 
     pub fn parse(&mut self) -> Result<Ast, std::io::Error> {
