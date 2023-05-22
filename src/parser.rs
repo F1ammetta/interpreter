@@ -5,6 +5,7 @@ use crate::lexer::{Lexer, Token};
 pub struct Parser {
     lexer: Lexer,
     current_token: Token,
+    pub errors: Vec<std::io::Error>,
     peek_token: Token,
 }
 
@@ -16,6 +17,7 @@ impl Parser {
             lexer,
             current_token,
             peek_token,
+            errors: Vec::new(),
         }
     }
     fn next_token(&mut self) {
@@ -38,45 +40,48 @@ impl Parser {
         let mut statement = LetStatement::new();
         statement.token = self.current_token.clone();
 
+        println!("Current token: {:?}", self.current_token);
+        println!("Peek token: {:?}", self.peek_token);
         match self.peek_token {
-            Token::Ident(_) => {
+            Token::Ident(ref name) => {
+                statement.name = name.clone();
                 self.next_token();
             }
             _ => {
-                return Err(std::io::Error::new(
+                self.errors.push(std::io::Error::new(
                     std::io::ErrorKind::InvalidInput,
-                    "Invalid token",
-                ))
+                    format!("Expected identifier, got {:?}", self.peek_token),
+                ));
+                self.next_token();
             }
         }
-
-        statement.name = match self.current_token {
-            Token::Ident(ref name) => name.clone(),
-            _ => {
-                return Err(std::io::Error::new(
-                    std::io::ErrorKind::InvalidInput,
-                    "Invalid token",
-                ))
-            }
-        };
 
         match self.peek_token {
             Token::Assign => {
                 self.next_token();
             }
             _ => {
-                return Err(std::io::Error::new(
+                self.errors.push(std::io::Error::new(
                     std::io::ErrorKind::InvalidInput,
-                    "Invalid token",
-                ))
+                    format!("Expected Assign, got {:?}", self.peek_token),
+                ));
+                self.next_token();
             }
         }
 
-        while self.current_token != Token::Semicolon {
+        while self.current_token != Token::Semicolon && self.current_token != Token::Eof {
             self.next_token();
         }
 
-        Ok(Statement::LetStatement(statement))
+        match self.errors.len() {
+            0 => Ok(Statement::LetStatement(statement)),
+            _ => Err(std::io::Error::new(
+                std::io::ErrorKind::InvalidInput,
+                "Invalid input",
+            )),
+        }
+
+        // Ok(Statement::LetStatement(statement))
     }
 
     pub fn parse(&mut self) -> Result<Ast, std::io::Error> {

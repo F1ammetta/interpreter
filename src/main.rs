@@ -20,7 +20,8 @@ fn repl() {
         std::io::stdin().read_line(&mut s).unwrap();
         let input = s.trim().to_string();
         let mut parser = Parser::new(Lexer::new(input));
-        let ast = parser.parse().unwrap();
+        let ast = parser.parse();
         println!("{:?}", ast);
+        println!("Errors: {:?}", parser.errors);
     }
 }
