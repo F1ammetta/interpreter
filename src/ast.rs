@@ -13,10 +13,7 @@ impl LetStatement {
         LetStatement {
             token: Token::Let,
             name: String::new(),
-            value: Expression {
-                token: Token::Ident("".to_string()),
-                value: String::new(),
-            },
+            value: Expression::default(),
         }
     }
 }
