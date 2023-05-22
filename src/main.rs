@@ -21,7 +21,13 @@ fn repl() {
         let input = s.trim().to_string();
         let mut parser = Parser::new(Lexer::new(input));
         let ast = parser.parse();
-        println!("{:?}", ast);
-        println!("Errors: {:?}", parser.errors);
+        match ast {
+            Ok(ast) => println!("{:?}", ast),
+            Err(_) => {
+                for err in parser.errors {
+                    println!("Parser Error: {}", err);
+                }
+            }
+        }
     }
 }

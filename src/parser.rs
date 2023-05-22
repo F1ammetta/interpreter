@@ -27,7 +27,7 @@ impl Parser {
 
     fn parse_statement(&mut self) -> Result<Statement, std::io::Error> {
         match self.current_token {
-            Token::Let => self.parse_let_statement(),
+            Token::Let => Ok(self.parse_let_statement()),
             _ => Err(std::io::Error::new(
                 std::io::ErrorKind::InvalidInput,
                 "Invalid token",
@@ -35,12 +35,10 @@ impl Parser {
         }
     }
 
-    fn parse_let_statement(&mut self) -> Result<Statement, std::io::Error> {
+    fn parse_let_statement(&mut self) -> Statement {
         let mut statement = LetStatement::new();
         statement.token = self.current_token.clone();
 
-        println!("Current token: {:?}", self.current_token);
-        println!("Peek token: {:?}", self.peek_token);
         match self.peek_token {
             Token::Ident(ref name) => {
                 statement.name = name.clone();
@@ -72,13 +70,7 @@ impl Parser {
             self.next_token();
         }
 
-        match self.errors.len() {
-            0 => Ok(Statement::LetStatement(statement)),
-            _ => Err(std::io::Error::new(
-                std::io::ErrorKind::InvalidInput,
-                "Invalid input",
-            )),
-        }
+        Statement::LetStatement(statement)
     }
 
     pub fn parse(&mut self) -> Result<Ast, std::io::Error> {
@@ -91,6 +83,13 @@ impl Parser {
             };
             ast.statements.push(statement);
             self.next_token();
+        }
+
+        if self.errors.len() > 0 {
+            return Err(std::io::Error::new(
+                std::io::ErrorKind::InvalidInput,
+                format!("{} errors found", self.errors.len()),
+            ));
         }
 
         Ok(ast)

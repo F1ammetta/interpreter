@@ -7,10 +7,14 @@ use crate::parser::Parser;
 
 #[test]
 fn parsing() {
-    let input = "
-    let x = 5;
-    let y = 10;
-    let foobar = 838383;
+    // let input = "
+    // let x = 5;
+    // let y = 10;
+    // let foobar = 838383;
+    // ";
+    let input = "let x 5;
+    let = 10;
+    let 838383;
     ";
 
     let lexer = Lexer::new(input.to_string());
@@ -18,8 +22,12 @@ fn parsing() {
 
     let ast = match parser.parse() {
         Ok(ast) => ast,
-        Err(errors) => {
-            println!("Parser errors: {:?}", errors);
+        Err(e) => {
+            println!("{}", e);
+            println!("Parses Errors:");
+            for e in parser.errors {
+                println!("{}", e);
+            }
             panic!();
         }
     };
