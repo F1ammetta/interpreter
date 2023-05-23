@@ -57,7 +57,7 @@ fn is_letter(ch: u8) -> bool {
 }
 
 fn is_number(ch: u8) -> bool {
-    b'0' <= ch && ch <= b'9' // || ch == b'.'
+    b'0' <= ch && ch <= b'9' || ch == b'.'
 }
 
 impl Lexer {
