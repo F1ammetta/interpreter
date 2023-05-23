@@ -19,6 +19,9 @@ fn repl() {
         std::io::stdout().flush().unwrap();
         std::io::stdin().read_line(&mut s).unwrap();
         let input = s.trim().to_string();
+        if input == "exit" {
+            break;
+        }
         let mut parser = Parser::new(Lexer::new(input));
         let ast = parser.parse();
         match ast {

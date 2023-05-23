@@ -3,15 +3,26 @@ use crate::lexer::Token;
 
 #[derive(Debug)]
 pub struct LetStatement {
-    pub token: Token,
     pub value: Expression,
     pub name: String,
+}
+
+#[derive(Debug)]
+pub struct ReturnStatement {
+    pub value: Expression,
+}
+
+impl ReturnStatement {
+    pub fn new() -> Self {
+        ReturnStatement {
+            value: Expression::default(),
+        }
+    }
 }
 
 impl LetStatement {
     pub fn new() -> Self {
         LetStatement {
-            token: Token::Let,
             name: String::new(),
             value: Expression::default(),
         }
@@ -27,7 +38,7 @@ pub struct Expression {
 #[derive(Debug)]
 pub enum Statement {
     LetStatement(LetStatement),
-    ReturnStatement,
+    ReturnStatement(ReturnStatement),
 }
 
 #[derive(Debug)]

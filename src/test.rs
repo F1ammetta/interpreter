@@ -1,5 +1,5 @@
 #![allow(unused_imports)]
-use crate::ast::{Ast, Expression, LetStatement, Statement};
+use crate::ast::{Ast, Expression, LetStatement, ReturnStatement, Statement};
 #[cfg(test)]
 use crate::lexer::Lexer;
 use crate::lexer::Token::*;
@@ -12,9 +12,10 @@ fn parsing() {
     // let y = 10;
     // let foobar = 838383;
     // ";
-    let input = "let x 5;
-    let = 10;
-    let 838383;
+    let input = "let x = 5;
+    let s = 10;
+    
+    return 3;
     ";
 
     let lexer = Lexer::new(input.to_string());
@@ -34,16 +35,17 @@ fn parsing() {
 
     assert_eq!(ast.statements.len(), 3);
 
-    let mut expected = vec!["x", "y", "foobar"];
+    let mut expected = vec!["x", "s"];
 
     for statement in ast.statements {
         match statement {
-            Statement::LetStatement(LetStatement { token, name, value }) => {
-                assert_eq!(token, Let);
+            Statement::LetStatement(LetStatement { name, value }) => {
                 assert_eq!(name, expected.remove(0));
                 assert_eq!(value, Expression::default());
             }
-            _ => panic!("Not a let statement"),
+            Statement::ReturnStatement(ReturnStatement { value }) => {
+                assert_eq!(value, Expression::default());
+            }
         }
     }
 }

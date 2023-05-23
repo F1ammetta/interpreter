@@ -1,5 +1,5 @@
 #![allow(dead_code)]
-use crate::ast::{Ast, LetStatement, Statement};
+use crate::ast::{Ast, LetStatement, ReturnStatement, Statement};
 use crate::lexer::{Lexer, Token};
 
 pub struct Parser {
@@ -28,6 +28,7 @@ impl Parser {
     fn parse_statement(&mut self) -> Result<Statement, std::io::Error> {
         match self.current_token {
             Token::Let => Ok(self.parse_let_statement()),
+            Token::Return => Ok(self.parse_return_statement()),
             _ => Err(std::io::Error::new(
                 std::io::ErrorKind::InvalidInput,
                 "Invalid token",
@@ -35,9 +36,19 @@ impl Parser {
         }
     }
 
+    fn parse_return_statement(&mut self) -> Statement {
+        let mut statement = ReturnStatement::new();
+        self.next_token();
+
+        while self.current_token != Token::Semicolon {
+            self.next_token();
+        }
+
+        Statement::ReturnStatement(statement)
+    }
+
     fn parse_let_statement(&mut self) -> Statement {
         let mut statement = LetStatement::new();
-        statement.token = self.current_token.clone();
 
         match self.peek_token {
             Token::Ident(ref name) => {
